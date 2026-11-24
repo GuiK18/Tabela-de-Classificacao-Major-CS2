@@ -62,7 +62,6 @@ lerCampeonato texto = traverse primeiroResultado (validarLinhas texto)
 todosOsErros :: String -> [Erro]
 todosOsErros texto = concat [erro : outros | Left (erro, outros) <- validarLinhas texto]
 
--- Cada linha produz uma partida ou pelo menos um erro.
 validarLinhas :: String -> [Either (Erro, [Erro]) Partida]
 validarLinhas texto = conferir [] (zip [1..] (lines texto))
   where
