@@ -15,8 +15,8 @@ main = do
   putStrLn (tabelaFormatada (classificacao (ateRodada 3 campeonatoTeste)))
 
   putStrLn "\n=== Estatisticas do campeonato ==="
-  putStrLn ("Maior diferenca de placar: " ++ mostrarGoleada (maiorGoleada campeonatoTeste))
-  putStrLn ("Media da soma dos placares por serie: " ++ mostrarMedia (mediaGols campeonatoTeste))
+  putStrLn ("Maior diferenca de placar: " ++ mostrarPartida (maiorDiferencaDeRounds campeonatoTeste))
+  putStrLn ("Media de rounds por partida: " ++ mostrarMedia (mediaRoundsPorPartida campeonatoTeste))
   putStrLn ("Aproveitamento do lider: " ++ mostrarAproveitamento (headSegura tabelaFinal))
 
   putStrLn "\n=== Demonstracao de entrada invalida ==="
@@ -39,10 +39,10 @@ main = do
         ]
   mapM_ (putStrLn . descreverErro) (todosOsErros textoComMaisErros)
 
-mostrarGoleada :: Maybe Partida -> String
-mostrarGoleada Nothing = "nenhuma partida"
-mostrarGoleada (Just partida) = mandante partida ++ " " ++ show (golsMandante partida)
-  ++ " x " ++ show (golsVisitante partida) ++ " " ++ visitante partida
+mostrarPartida :: Maybe Partida -> String
+mostrarPartida Nothing = "nenhuma partida"
+mostrarPartida (Just partida) = mandante partida ++ " " ++ show (roundsMandante partida)
+  ++ " x " ++ show (roundsVisitante partida) ++ " " ++ visitante partida
 
 mostrarMedia :: Maybe Double -> String
 mostrarMedia = maybe "sem partidas" show
