@@ -3,8 +3,7 @@ module Dados (dadosCampeonato, campeonatoTeste) where
 import Tipos (Partida)
 import Leitura (lerCampeonato)
 
--- Campeonato ficticio para fins didaticos. Os placares sao pontos de uma serie
--- simplificada; o empate foi mantido para atender ao exercicio da disciplina.
+
 dadosCampeonato :: String
 dadosCampeonato = unlines
   [ "# rodada;mandante;placar mandante;placar visitante;visitante"
@@ -25,7 +24,6 @@ dadosCampeonato = unlines
   , "5;G2;13;11;NAVI"
   ]
 
--- Lemos a tabela de exemplo pelo mesmo caminho usado para qualquer entrada.
 campeonatoTeste :: [Partida]
 campeonatoTeste = case lerCampeonato dadosCampeonato of
   Right partidas -> partidas
