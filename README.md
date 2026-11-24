@@ -2,7 +2,7 @@
 
 Este é um trabalho de Programação Funcional feito em Haskell. O programa usa os resultados de um campeonato fictício de CS2 para mostrar a tabela final, a classificação após a terceira rodada e algumas estatísticas, como a maior diferença de placar. Também mostra o que acontece quando uma partida tem dados inválidos.
 
-O ambiente escolhido para a entrega é o **GHC local**, usando a versão em módulos da pasta `src/`. Também dá para executar o projeto com GHC no Windows ou no Linux e pelo OnlineGDB.
+O ambiente escolhido para a entrega é o **GHC local**, usando a versão em módulos da pasta `src/`. Também dá para executar o projeto pelo OnlineGDB.
 
 ## Estrutura
 
