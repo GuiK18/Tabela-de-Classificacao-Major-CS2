@@ -6,12 +6,12 @@ module Classificacao
   , aproveitamento
   , classificacao
   , ateRodada
-  , maiorGoleada
-  , mediaGols
+  , maiorDiferencaDeRounds
+  , mediaRoundsPorPartida
   ) where
 
 import Data.Char (toLower)
-import Data.List (sortBy) -- se der erro mudar para import Data.List (foldl', sortBy)
+import Data.List (sortBy) 
 import Data.Ord (Down(..), comparing)
 import Tipos
 
@@ -37,14 +37,14 @@ acumular time linha partida =
            , vitorias = vitorias linha + v
            , empates = empates linha + e
            , derrotas = derrotas linha + d
-           , golsPro = golsPro linha + pro
-           , golsContra = golsContra linha + contra
+           , roundsPro = roundsPro linha + pro
+           , roundsContra = roundsContra linha + contra
            }
 
 placarDoTime :: Time -> Partida -> (Int, Int)
 placarDoTime time partida
-  | time == mandante partida = (golsMandante partida, golsVisitante partida)
-  | otherwise = (golsVisitante partida, golsMandante partida)
+  | time == mandante partida = (roundsMandante partida, roundsVisitante partida)
+  | otherwise = (roundsVisitante partida, roundsMandante partida)
 
 contabilizarResultado :: Resultado -> (Int, Int, Int)
 contabilizarResultado Vitoria = (1, 0, 0)
@@ -55,7 +55,7 @@ pontosLinha :: Linha -> Int
 pontosLinha linha = 3 * vitorias linha + empates linha
 
 saldo :: Linha -> Int
-saldo linha = golsPro linha - golsContra linha
+saldo linha = roundsPro linha - roundsContra linha
 
 aproveitamento :: Linha -> Double
 aproveitamento linha
@@ -66,11 +66,11 @@ classificacao :: [Partida] -> [Linha]
 classificacao partidas = sortBy comparar linhas
   where
     linhas = map (linhaDoTime partidas) (times partidas)
-   
+    
     comparar = comparing (Down . pontosLinha)
       <> comparing (Down . vitorias)
       <> comparing (Down . saldo)
-      <> comparing (Down . golsPro)
+      <> comparing (Down . roundsPro)
       <> comparing (map toLower . linhaTime)
 
 ateRodada :: Int -> [Partida] -> [Partida]
@@ -78,8 +78,8 @@ ateRodada limite partidas = filter dentroDoLimite partidas
   where
     dentroDoLimite partida = rodada partida <= limite
 
-maiorGoleada :: [Partida] -> Maybe Partida
-maiorGoleada = foldl' escolher Nothing
+maiorDiferencaDeRounds :: [Partida] -> Maybe Partida
+maiorDiferencaDeRounds = foldl' escolher Nothing
   where
     escolher :: Maybe Partida -> Partida -> Maybe Partida
     escolher Nothing partida = Just partida
@@ -87,11 +87,11 @@ maiorGoleada = foldl' escolher Nothing
       | diferenca candidata > diferenca atual = Just candidata
       | otherwise = Just atual
     diferenca :: Partida -> Int
-    diferenca partida = abs (golsMandante partida - golsVisitante partida)
+    diferenca partida = abs (roundsMandante partida - roundsVisitante partida)
 
-mediaGols :: [Partida] -> Maybe Double
-mediaGols [] = Nothing
-mediaGols partidas = Just (fromIntegral total / fromIntegral quantidade)
+mediaRoundsPorPartida :: [Partida] -> Maybe Double
+mediaRoundsPorPartida [] = Nothing
+mediaRoundsPorPartida partidas = Just (fromIntegral total / fromIntegral quantidade)
   where
-    total = sum [golsMandante jogo + golsVisitante jogo | jogo <- partidas]
+    total = sum [roundsMandante jogo + roundsVisitante jogo | jogo <- partidas]
     quantidade = length partidas
