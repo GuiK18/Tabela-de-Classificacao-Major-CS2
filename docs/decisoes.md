@@ -1,49 +1,36 @@
-# Decisões de modelagem e limitações conhecidas
+# Decisões do projeto
 
-## Aderência ao enunciado
+## Como montamos o campeonato
 
-Esta versão foi ajustada para cumprir os requisitos do PjBL2. As restrições da proposta anterior que proibiam `data`, `type`, records, módulos e bibliotecas não podem ser mantidas: o PDF exige tipos algébricos e records, permite a organização em módulos e pede funções de bibliotecas padrão, como `sortBy`, `comparing`, `Down` e `readMaybe`.
+Escolhemos o tema de Major de CS2 e criamos uma fase classificatória fictícia com seis equipes, cinco rodadas e 15 partidas. Cada equipe joga uma vez por rodada. Alguns confrontos se repetem em rodadas diferentes.
 
-Também não adotamos a proposta de modelar somente os playoffs de eliminação. Ela não cobre o formato de tabela, o empate 0–0 e os casos de classificação empatada exigidos pelo trabalho. O escopo escolhido é uma fase classificatória fictícia de CS2, adequada às três camadas e aos testes obrigatórios.
+A pontuação é simples: vitória vale 3 pontos, empate vale 1 e derrota vale 0. Mantivemos um empate em 0 × 0 entre G2 e MOUZ para cobrir o caso pedido no trabalho.
 
-| Proposta anterior | Ajuste para atender ao PDF |
-|---|---|
-| Proibir `type`, `data`, records e módulos | Usar `Time`, `Resultado`, `Partida`, `Linha` e `Erro` com os tipos pedidos; separar em módulos ou seções. |
-| Representar resultado por `Bool` e estruturas por tuplas | Usar o tipo soma `Resultado` e records nomeados, evitando estados ambíguos e trocas de campos. |
-| Usar apenas o Prelude e implementar ordenação própria | Usar apenas a biblioteca padrão `base` e ordenar com `sortBy`, `comparing`, `Down` e `(<>)`. |
-| Criar um conversor numérico próprio | Usar `readMaybe`; entradas malformadas retornam um erro em vez de lançar exceção. |
-| Fazer somente playoffs sem empate | Modelar uma tabela classificatória com empate, incluindo o caso 0–0 exigido. |
+## Como representamos os dados
 
-## Formato do campeonato
+Usamos `Time` como um nome para `String` e criamos o tipo `Resultado` com três opções: `Vitoria`, `Empate` e `Derrota`. A função `resultadoPara` devolve `Nothing` se a equipe não participou da partida.
 
-O programa representa um campeonato didático de seis equipes e cinco rodadas, com uma partida por equipe em cada rodada. Alguns confrontos se repetem em rodadas diferentes. São três partidas por rodada e quinze no total. O programa demonstra a classificação final e a classificação até a terceira rodada.
+`Partida` e `Linha` são registros com campos nomeados. Isso ajuda a distinguir valores do mesmo tipo, como o placar do mandante e o do visitante. `Partida` guarda os dados de um jogo, enquanto `Linha` guarda os totais de uma equipe na tabela.
 
-A temática é CS2, mas os placares são inteiros genéricos usados para exercitar pontos, saldo, maior diferença e média. Os campos `golsMandante` e `golsVisitante` preservam a interface do enunciado. O empate 0–0 é uma simplificação acadêmica obrigatória; não representa uma regra oficial de uma série de CS2 nem um playoff real.
+## Como calculamos a tabela
 
-Os dados de teste incluem o empate 0–0 entre G2 e MOUZ, a vitória de FURIA por 13–3 contra G2 e o empate em pontos entre NAVI e Vitality na classificação final. NAVI fica à frente pelo saldo: ambos têm seis pontos e duas vitórias, mas NAVI tem saldo +3 e Vitality, +2.
+Usamos `foldl'` para percorrer as partidas e atualizar os totais de cada equipe. A cada jogo, somamos o resultado e os placares a favor e contra. Para ver a tabela até a terceira rodada, filtramos as partidas primeiro e aplicamos o mesmo cálculo.
 
-## Tipos e funções
+A tabela é ordenada por pontos, vitórias, saldo e placar a favor. Se o empate continuar, usamos a ordem alfabética. No exemplo, NAVI e Vitality terminam com 6 pontos e 2 vitórias cada. A NAVI fica na frente porque tem saldo de +3, enquanto a Vitality tem +2.
 
-- `type Time = String` representa o nome de uma equipe.
-- `Resultado` é o tipo soma `Vitoria | Empate | Derrota`.
-- `Partida` é um record com rodada, mandante, placar do mandante, placar do visitante e visitante.
-- `Linha` é um record com equipe, jogos, vitórias, empates, derrotas, placar a favor e contra.
-- `Erro` é um tipo soma com os construtores mínimos exigidos: `CamposInvalidos`, `NumeroInvalido`, `PlacarNegativo`, `MesmoTime` e `TimeRepetidoNaRodada`. `RodadaInvalida` é um caso adicional.
+Usamos `Maybe` nas funções de média e maior diferença de placar. Se a lista estiver vazia, as duas retornam `Nothing`, porque não há partidas para comparar nem placares para calcular a média.
 
-A camada de classificação usa as funções requeridas pelo PDF. Vitória vale 3 pontos, empate 1 e derrota 0. A ordem é: pontos, vitórias, saldo, placar a favor e nome da equipe em ordem alfabética, comparado sem diferenciar maiúsculas e minúsculas. A implementação usa `map`, `filter`, `foldl'`, composição, `sortBy`, `comparing`, `Down` e `(<>)`; não implementa uma ordenação própria.
+## Como tratamos a entrada
 
-A camada de leitura usa `readMaybe`, `Either`, notação `do` e `traverse`. `lerCampeonato` interrompe no primeiro erro e `todosOsErros` reúne os problemas encontrados. Linhas em branco e comentários iniciados por `#` são ignorados. `Maybe` representa resultados que podem não existir, como a maior goleada ou a média em uma lista vazia.
+As partidas de exemplo ficam como texto em `src/Dados.hs`. Cada linha tem os dados de uma partida separados por ponto e vírgula. Linhas em branco e comentários que começam com `#` são ignorados.
 
-## Organização e testes
+Usamos `readMaybe` para converter os números. Assim, um placar escrito como `treze` vira um erro de leitura. `lerCampeonato` usa `Either` para retornar as partidas ou o primeiro erro na ordem das linhas. Já `todosOsErros` percorre a entrada inteira e reúne os problemas encontrados.
 
-A entrega modular contém `src/Tipos.hs`, `src/Classificacao.hs`, `src/Leitura.hs`, `src/Dados.hs`, `src/Main.hs`, `tests/Testes.hs`, este documento e um README. A versão de arquivo único organiza o mesmo código em seções comentadas para uso em playground; a escolha do ambiente de execução deve ser informada na entrega.
+Deixamos o cálculo e a validação em funções puras. O `main` usa essas funções para mostrar a tabela, as estatísticas e exemplos de erros. Isso também permite testar o cálculo separado da saída no terminal.
 
-Os testes cobrem as três camadas, a classificação completa conferida manualmente, o desempate por saldo, a classificação até a terceira rodada, listas vazias, entrada válida, cada construtor de erro e um relatório com várias linhas inválidas.
+## Limitações
 
-## Limitações conhecidas
-
-- O programa modela somente a fase classificatória; não implementa Swiss, playoffs, séries MD3/MD5, overtime ou regras oficiais de Major.
-- O placar é um inteiro genérico e não é validado como placar possível de um mapa ou série real.
-- Só são listadas equipes que aparecem em alguma partida; não há cadastro separado de equipes sem jogos.
-- O desempate alfabético final é uma convenção didática, não uma regra oficial de competição.
-- Os dados ficam embutidos no código para que o programa funcione em ambientes sem entrada pelo teclado.
+- O projeto cobre a fase classificatória. Fases suíças, playoffs, séries MD3 e MD5 e prorrogação ficam fora da simulação.
+- Os placares são simplificados. A validação verifica o formato e rejeita valores negativos, mas aceita placares que podem não ocorrer em um mapa real de CS2.
+- A tabela inclui as equipes que aparecem nas partidas. Uma equipe sem jogos registrados não aparece na classificação.
+- O relatório pode apontar erros em várias linhas. Se uma única linha tiver mais de um campo inválido, a leitura dessa linha aponta o primeiro problema encontrado.
