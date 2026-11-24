@@ -17,9 +17,12 @@ main = do
     (times campeonatoTeste) ["FaZe", "FURIA", "G2", "MOUZ", "NAVI", "Vitality"]
 
   putStrLn "\n--- Camada 2 ---"
-  testar "classificacao final conferida" (map linhaTime (classificacao campeonatoTeste))
+  let tabelaFinal = classificacao campeonatoTeste
+      tabelaRodada3 = classificacao (ateRodada 3 campeonatoTeste)
+
+  testar "classificacao final conferida" (map linhaTime tabelaFinal)
     ["MOUZ", "FURIA", "NAVI", "Vitality", "G2", "FaZe"]
-  testar "estatisticas completas da classificacao final" (classificacao campeonatoTeste)
+  testar "estatisticas completas da classificacao final" tabelaFinal
     [ Linha "MOUZ" 5 4 1 0 52 37
     , Linha "FURIA" 5 4 0 1 63 41
     , Linha "NAVI" 5 2 0 3 52 49
@@ -28,14 +31,17 @@ main = do
     , Linha "FaZe" 5 1 0 4 44 63
     ]
   testar "empate em pontos decidido pelo saldo"
-    (map saldo (take 2 (drop 2 (classificacao campeonatoTeste)))) [3, 2]
+    (map saldo (take 2 (drop 2 tabelaFinal))) [3, 2]
   testar "classificacao apos rodada 3 e diferente da final"
-    (map linhaTime (classificacao (ateRodada 3 campeonatoTeste)) /= map linhaTime (classificacao campeonatoTeste)) True
-  testar "maiorGoleada []" (maiorGoleada []) Nothing
-  testar "maior goleada do campeonato"
-    (maiorGoleada campeonatoTeste) (Just (Partida 3 "FURIA" 13 3 "G2"))
-  testar "mediaGols []" (mediaGols []) Nothing
-  testar "media de placar do campeonato" (mediaGols campeonatoTeste) (Just (295 / 15))
+    (map linhaTime tabelaRodada3 /= map linhaTime tabelaFinal) True
+  testar "maior diferenca de rounds em lista vazia"
+    (maiorDiferencaDeRounds []) Nothing
+  testar "maior diferenca de rounds do campeonato"
+    (maiorDiferencaDeRounds campeonatoTeste) (Just (Partida 3 "FURIA" 13 3 "G2"))
+  testar "media de rounds em lista vazia"
+    (mediaRoundsPorPartida []) Nothing
+  testar "media de rounds por partida"
+    (mediaRoundsPorPartida campeonatoTeste) (Just (295 / 15))
   testar "pontuacao de vitoria, empate e derrota"
     (map pontos [Vitoria, Empate, Derrota]) [3, 1, 0]
   testar "aproveitamento sem jogos" (aproveitamento (linhaDoTime [] "Time novo")) 0.0
@@ -50,13 +56,15 @@ main = do
     (ehErro isRepetido (lerCampeonato "1;FURIA;13;7;NAVI\n1;FURIA;13;3;G2\n")) True
   testar "RodadaInvalida" (ehErro isRodada (lerPartida 1 "0;FURIA;13;7;NAVI")) True
   testar "todosOsErros encontra tres linhas invalidas"
-    (todosOsErros "1;FURIA;xx;7;NAVI\n1;G2;-1;0;MOUZ\n1;NAVI;1;1;NAVI\n") [NumeroInvalido 1 "xx", PlacarNegativo 2, MesmoTime 3 "NAVI"]
+    (todosOsErros "1;FURIA;xx;7;NAVI\n1;G2;-1;0;MOUZ\n1;NAVI;1;1;NAVI\n")
+    [NumeroInvalido 1 "xx", PlacarNegativo 2, MesmoTime 3 "NAVI"]
   testar "duplicidade antes de um erro de leitura"
     (lerCampeonato "1;A;1;0;B\n1;A;2;0;C\n2;A;x;0;B")
     (Left (TimeRepetidoNaRodada 2 1 "A"))
   testar "comentarios e linhas em branco sao ignorados"
     (lerCampeonato "\n# comentario\n1;FURIA;13;7;NAVI\n" == Right [partidaExemplo]) True
-  testar "entrada vazia produz campeonato vazio" (lerCampeonato "  \n# nada\n") (Right [])
+  testar "entrada vazia produz campeonato vazio"
+    (lerCampeonato "  \n# nada\n") (Right [])
 
 partidaExemplo :: Partida
 partidaExemplo = Partida 1 "FURIA" 13 7 "NAVI"
