@@ -11,7 +11,7 @@ module Classificacao
   ) where
 
 import Data.Char (toLower)
-import Data.List (foldl', sortBy)
+import Data.List (sortBy) -- se der erro mudar para import Data.List (foldl', sortBy)
 import Data.Ord (Down(..), comparing)
 import Tipos
 
