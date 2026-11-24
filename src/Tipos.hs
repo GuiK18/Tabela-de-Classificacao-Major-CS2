@@ -19,8 +19,8 @@ data Resultado = Vitoria | Empate | Derrota
 data Partida = Partida
   { rodada         :: Int
   , mandante       :: Time
-  , golsMandante   :: Int
-  , golsVisitante  :: Int
+  , roundsMandante   :: Int
+  , roundsVisitante  :: Int
   , visitante      :: Time
   } deriving (Eq, Show)
 
@@ -30,8 +30,8 @@ data Linha = Linha
   , vitorias   :: Int
   , empates    :: Int
   , derrotas   :: Int
-  , golsPro    :: Int
-  , golsContra :: Int
+  , roundsPro    :: Int
+  , roundsContra :: Int
   } deriving (Eq, Show)
 
 participou :: Time -> Partida -> Bool
@@ -39,14 +39,14 @@ participou time partida = time == mandante partida || time == visitante partida
 
 resultadoPara :: Time -> Partida -> Maybe Resultado
 resultadoPara time partida
-  | time == mandante partida = Just (compararPlacar (golsMandante partida) (golsVisitante partida))
-  | time == visitante partida = Just (compararPlacar (golsVisitante partida) (golsMandante partida))
+  | time == mandante partida = Just (compararPlacar (roundsMandante partida) (roundsVisitante partida))
+  | time == visitante partida = Just (compararPlacar (roundsVisitante partida) (roundsMandante partida))
   | otherwise = Nothing
 
 compararPlacar :: Int -> Int -> Resultado
-compararPlacar golsTime golsAdversario
-  | golsTime > golsAdversario = Vitoria
-  | golsTime == golsAdversario = Empate
+compararPlacar roundsTime roundsAdversario
+  | roundsTime > roundsAdversario = Vitoria
+  | roundsTime == roundsAdversario = Empate
   | otherwise = Derrota
 
 times :: [Partida] -> [Time]
