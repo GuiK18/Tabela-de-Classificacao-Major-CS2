@@ -45,7 +45,7 @@ A opção `-isrc` indica onde o GHC encontra os módulos. A opção `-Wall` most
 
 1. Acesse o [OnlineGDB para Haskell](https://www.onlinegdb.com/online_haskell_compiler).
 2. Abra um projeto Haskell vazio.
-3. Cole todo o conteúdo de `playground/Main.hs` no arquivo principal do editor.
+3. Faça upload de todos os arquivos do `src` dentro do ambiente de execução, substituindo todo o codigo do Main.hs para o main.hs do site.
 4. Clique em **Run**. Os resultados aparecem na área de saída.
 
 ## Rodar os testes
@@ -65,6 +65,9 @@ ghc -Wall -isrc tests/Testes.hs -o testes.exe
 ghc -Wall -isrc tests/Testes.hs -o testes
 ./testes
 ```
+**OnlineGDB**
+
+substitua todo conteudo do arquivo `Testes.hc` dentro do main.hs aberto no onlineGDB
 
 Cada teste mostra `OK` ou `FALHOU`. Os testes conferem a classificação, os desempates e casos de entrada inválida.
 
