@@ -66,7 +66,7 @@ classificacao :: [Partida] -> [Linha]
 classificacao partidas = sortBy comparar linhas
   where
     linhas = map (linhaDoTime partidas) (times partidas)
-    -- Só consultamos o critério seguinte quando o anterior dá empate.
+   
     comparar = comparing (Down . pontosLinha)
       <> comparing (Down . vitorias)
       <> comparing (Down . saldo)
