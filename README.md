@@ -78,3 +78,12 @@ O exemplo tem seis equipes e cinco rodadas. Vitória vale 3 pontos, empate vale 
 As partidas ficam em `src/Dados.hs`. Por exemplo, a linha `1;FURIA;13;7;NAVI` representa uma vitória da FURIA por 13 a 7 na primeira rodada. Se estiver usando a versão de arquivo único, procure `dadosCampeonato` em `playground/Main.hs` para alterar os resultados.
 
 As decisões do grupo e as limitações da simulação estão em [docs/decisoes.md](docs/decisoes.md).
+
+## Importante 
+
+Obs.: Caso executar pelo GHC com o -Wall e ocorrer um erro na linha 14 do arquivo Classificacao.hs
+Mude a linha para
+```bash
+import Data.List (sortBy) 
+```
+Como o GHC possui `foldl'` nativo ocorre um erro por redundancia, precisa apenas remover o `fold'` e deixar como está acima. Também existe a possibilidade de executar sem o `-Wall`
